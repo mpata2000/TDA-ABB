@@ -4,33 +4,6 @@
 #define ERROR -1
 
 /*
- * Comparador de elementos. Recibe dos elementos del arbol y devuelve
- * 0 en caso de ser iguales, 1 si el primer elemento es mayor al
- * segundo o -1 si el primer elemento es menor al segundo.
- */
-typedef int (*abb_comparador)(void*, void*);
-
-/*
- * Destructor de elementos. Cada vez que un elemento deja el arbol
- * (arbol_borrar o arbol_destruir) se invoca al destructor pasandole
- * el elemento.
- */
-typedef void (*abb_liberar_elemento)(void*);
-
-
-typedef struct nodo_abb {
-  void* elemento;
-  struct nodo_abb* izquierda;
-  struct nodo_abb* derecha;
-} nodo_abb_t;
-
-typedef struct abb{
-  nodo_abb_t* nodo_raiz;
-  abb_comparador comparador;
-  abb_liberar_elemento destructor;
-} abb_t;
-
-/*
  * Crea el arbol y reserva la memoria necesaria de la estructura.
  * Comparador se utiliza para comparar dos elementos.
  * Destructor es invocado sobre cada elemento que sale del arbol,
