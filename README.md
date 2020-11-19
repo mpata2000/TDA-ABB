@@ -2,7 +2,7 @@
 
 ## **Tabla de Contenidos**
 
-- [**TDA Lista**](#tda-lista)
+- [**TDA ABB**](#tda-abb)
   - [**Tabla de Contenidos**](#tabla-de-contenidos)
   - [**Compilacion:**](#compilacion)
   - [**Makefile:**](#makefile)
@@ -15,24 +15,7 @@
       - [**make clean:**](#make-clean)
       - [**make %.o:**](#make-o)
   - [**Funcionamiento:**](#funcionamiento)
-    - [**pruebas.c (el main):**](#pruebasc-el-main)
-    - [**Puntero NULL**](#puntero-null)
-    - [**Creacion de Lista:**](#creacion-de-lista)
-    - [**Lista vacia:**](#lista-vacia)
-    - [**Funciones equivalentes:**](#funciones-equivalentes)
-    - [**Listas como pilas:**](#listas-como-pilas)
-    - [**Busqueda y liberacion de nodos:**](#busqueda-y-liberacion-de-nodos)
-    - [**Creacion del iterador externo:**](#creacion-del-iterador-externo)
-    - [**Iterador interno:**](#iterador-interno)
   - [**Teorico:**](#teorico)
-    - [**TDA Lista-Teorico**](#tda-lista-teorico)
-      - [**¿Qué es lo que entendés por una lista?**](#qué-es-lo-que-entendés-por-una-lista)
-      - [**¿Cuáles son las diferencias entre ser simple o doblemente enlazada?**](#cuáles-son-las-diferencias-entre-ser-simple-o-doblemente-enlazada)
-      - [**¿Cuáles son las características fundamentales de las Pilas?**](#cuáles-son-las-características-fundamentales-de-las-pilas)
-      - [**¿Cuáles son las características fundamentales de las Colas?**](#cuáles-son-las-características-fundamentales-de-las-colas)
-    - [**Iterador-Teorico**](#iterador-teorico)
-      - [**¿Qué es un iterador? ¿Cuál es su función?**](#qué-es-un-iterador-cuál-es-su-función)
-      - [**¿En qué se diferencia un iterador interno de uno externo?**](#en-qué-se-diferencia-un-iterador-interno-de-uno-externo)
   - [**Creditos:**](#creditos)
 
 ## **Compilacion:**
