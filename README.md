@@ -20,7 +20,6 @@
 
 ## **Compilacion:**
 
-----
 Para compilar y usar este TDA se utiliza un makefile.
 
 **La linea principal de compilacion es:**
@@ -41,39 +40,37 @@ Para compilar y usar este TDA se utiliza un makefile.
 
 ## **Makefile:**
 
-----
-
 ```makefile
 CC = gcc
 CFILES = *.c
 HFILES = *.h
-OBJETOS = lista.o lista_minipruebas.o
-FILES = Enunciado README.md
-EXEC = lista_se
-CFLAGS = -g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O0
-VFLAGS = --leak-check=full --track-origins=yes --show-reachable=yes
+OBJETOS = abb.o
+FILES = Enunciado README.md makefile
+EXEC = abb
+CFLAGS =  -g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O0
+VFLAGS = --leak-check=full --track-origins=yes --show-reachable=yes 
 
-$(EXEC): pruebas.c $(OBJETOS)
-    $(CC) $^ $(CFLAGS) -o $(EXEC)
+$(EXEC): abb_minipruebas.c $(OBJETOS)
+	$(CC) $^ $(CFLAGS) -o $(EXEC)
 
 debug: $(EXEC)
-    gdb $(EXEC)
+	gdb $(EXEC)
 
 test: $(EXEC)
-   valgrind $(VFLAGS) ./$(EXEC)
+	valgrind $(VFLAGS) ./$(EXEC) $(arg_1) $(arg_2) $(arg_3)
 
 run: $(EXEC)
-   ./$(EXEC) $(arg_1) $(arg_2) $(arg_3)
+	./$(EXEC) $(arg_1) $(arg_2) $(arg_3)
 
 %.o: %.c %.h
-   $(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
-zip:
-   zip -r $(EXEC).zip $(CFILES) $(HFILES) $(FILES)
+zip: 
+	zip -r $(EXEC).zip $(CFILES) $(HFILES) $(FILES)
 
 .PHONY: clean
 clean:
-   rm -f *.o $(EXEC)
+	rm -f *.o $(EXEC)
 ```
 
 ### **Comandos:**

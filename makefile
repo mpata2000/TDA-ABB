@@ -2,7 +2,7 @@ CC = gcc
 CFILES = *.c
 HFILES = *.h
 OBJETOS = abb.o
-FILES = Enunciado README makefile
+FILES = Enunciado README.md makefile
 EXEC = abb
 CFLAGS =  -g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O0
 VFLAGS = --leak-check=full --track-origins=yes --show-reachable=yes 
