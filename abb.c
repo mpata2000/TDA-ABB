@@ -35,7 +35,7 @@ nodo_abb_t* insertar_nodo_arbol(nodo_abb_t* raiz,void* elemento,abb_comparador c
 	if(comparador(elemento,raiz->elemento) > 0){
 		raiz->derecha = insertar_nodo_arbol(raiz->derecha,elemento,comparador,exito);
 	}else{
-		raiz->izquierda = insertar_nodo_arbol(raiz->derecha,elemento,comparador,exito);
+		raiz->izquierda = insertar_nodo_arbol(raiz->izquierda,elemento,comparador,exito);
 	}
 
 	return raiz;
@@ -75,15 +75,13 @@ void* buscar_nodo(nodo_abb_t* raiz,void* elemento,abb_comparador comparador){
 	}
 
 	int comparacion = comparador(elemento,raiz->elemento);
-
-	if(comparacion == 0){
-		return raiz->elemento;
-	}
+	
 	if(comparacion > 0){
 		buscar_nodo(raiz->derecha,elemento,comparador);
-	}else{
+	}else if(comparacion < 0){
 		buscar_nodo(raiz->derecha,elemento,comparador);
 	}
+	return raiz->elemento;
 }
 /*
  * Busca en el arbol un elemento igual al provisto (utilizando la
@@ -92,7 +90,7 @@ void* buscar_nodo(nodo_abb_t* raiz,void* elemento,abb_comparador comparador){
  * Devuelve el elemento encontrado o NULL si no lo encuentra.
  */
 void* arbol_buscar(abb_t* arbol, void* elemento){
-	if(arbol_vacio) return NULL;
+	if(arbol_vacio(arbol)) return NULL;
 	return buscar_nodo(arbol->nodo_raiz,elemento,arbol->comparador);
 }
 
@@ -101,7 +99,7 @@ void* arbol_buscar(abb_t* arbol, void* elemento){
  * vacío o no existe.
  */
 void* arbol_raiz(abb_t* arbol){
-	if(arbol_vacio) return NULL;
+	if(arbol_vacio(arbol)) return NULL;
 	return arbol->nodo_raiz;
 }
 
@@ -155,7 +153,9 @@ void destruir_nodos(nodo_abb_t* raiz,abb_liberar_elemento destructor){
     destruir_nodos(raiz->izquierda,destructor);  //Postorden
     destruir_nodos(raiz->derecha,destructor);
 
-    if(!destructor) destructor(raiz->elemento);
+    if(destructor){
+		destructor(raiz->elemento);
+	}	
     free(raiz);
 }
 /*
@@ -166,6 +166,7 @@ void destruir_nodos(nodo_abb_t* raiz,abb_liberar_elemento destructor){
 void arbol_destruir(abb_t* arbol){
     if(arbol_vacio(arbol)) return;
 	destruir_nodos(arbol->nodo_raiz,arbol->destructor);
+	free(arbol);
 }
 
 /*
