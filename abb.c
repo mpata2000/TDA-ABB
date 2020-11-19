@@ -36,7 +36,11 @@ typedef struct abb{
  * Devuelve un puntero al arbol creado o NULL en caso de error.
  */
 abb_t* arbol_crear(abb_comparador comparador, abb_liberar_elemento destructor){
-
+    if(!comparador) return NULL;
+    abb_t* arbol = calloc(1,sizeof(abb_t));
+    arbol->comparador = comparador;
+    arbol->destructor = destructor;
+    return arbol;
 }
 
 /*
@@ -82,7 +86,8 @@ void* arbol_raiz(abb_t* arbol){
  * Devuelve true si está vacío o el arbol es NULL, false si el árbol tiene elementos.
  */
 bool arbol_vacio(abb_t* arbol){
-
+    if(!arbol) return true;
+    return ((!arbol->nodo_raiz)||(!arbol->comparador));
 }
 
 /*
@@ -121,13 +126,21 @@ size_t arbol_recorrido_postorden(abb_t* arbol, void** array, size_t tamanio_arra
 
 }
 
+void destruir_nodos(nodo_abb_t* raiz,abb_liberar_elemento destructor){
+    if(!raiz) return;
+    destruir_nodos(raiz->izquierda,destructor);  //Postorden
+    destruir_nodos(raiz->derecha,destructor);
+
+    if(!destructor) destructor(raiz->elemento);
+    free(raiz);
+}
 /*
  * Destruye el arbol liberando la memoria reservada por el mismo.
  * Adicionalmente invoca el destructor con cada elemento presente en
  * el arbol.
  */
 void arbol_destruir(abb_t* arbol){
-
+    if(arbol_vacio(arbol));
 }
 
 /*
