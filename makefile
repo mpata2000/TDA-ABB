@@ -5,13 +5,14 @@ OBJETOS = abb.o
 FILES = Enunciado README.md makefile
 EXEC = abb
 CFLAGS =  -g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O0
+GFLAGS = --tui
 VFLAGS = --leak-check=full --track-origins=yes --show-reachable=yes 
 
 $(EXEC): abb_minipruebas.c $(OBJETOS)
 	$(CC) $^ $(CFLAGS) -o $(EXEC)
 
 debug: $(EXEC)
-	gdb $(EXEC)
+	gdb $(GFLAGS) $(EXEC)
 
 test: $(EXEC)
 	valgrind $(VFLAGS) ./$(EXEC) $(arg_1) $(arg_2) $(arg_3)

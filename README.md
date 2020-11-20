@@ -16,6 +16,9 @@
       - [**make %.o:**](#make-o)
   - [**Funcionamiento:**](#funcionamiento)
   - [**Teorico:**](#teorico)
+    - [**Explicar qué es un ABB y cómo se diferencia de un Árbol Binario.**](#explicar-qué-es-un-abb-y-cómo-se-diferencia-de-un-árbol-binario)
+    - [**Explicar cuál es el objetivo de tener una función de destrucción en el TDA y qué implicaría para el usuario no tenerla.**](#explicar-cuál-es-el-objetivo-de-tener-una-función-de-destrucción-en-el-tda-y-qué-implicaría-para-el-usuario-no-tenerla)
+    - [**¿Cuál es la complejidad de las diferentes operaciones del ABB? Justifique.**](#cuál-es-la-complejidad-de-las-diferentes-operaciones-del-abb-justifique)
   - [**Creditos:**](#creditos)
 
 ## **Compilacion:**
@@ -51,26 +54,26 @@ CFLAGS =  -g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O0
 VFLAGS = --leak-check=full --track-origins=yes --show-reachable=yes 
 
 $(EXEC): abb_minipruebas.c $(OBJETOS)
-	$(CC) $^ $(CFLAGS) -o $(EXEC)
+   $(CC) $^ $(CFLAGS) -o $(EXEC)
 
 debug: $(EXEC)
-	gdb $(EXEC)
+   gdb $(EXEC)
 
 test: $(EXEC)
-	valgrind $(VFLAGS) ./$(EXEC) $(arg_1) $(arg_2) $(arg_3)
+   valgrind $(VFLAGS) ./$(EXEC) $(arg_1) $(arg_2) $(arg_3)
 
 run: $(EXEC)
-	./$(EXEC) $(arg_1) $(arg_2) $(arg_3)
+   ./$(EXEC) $(arg_1) $(arg_2) $(arg_3)
 
 %.o: %.c %.h
-	$(CC) $(CFLAGS) -c $< -o $@
+   $(CC) $(CFLAGS) -c $< -o $@
 
 zip: 
-	zip -r $(EXEC).zip $(CFILES) $(HFILES) $(FILES)
+   zip -r $(EXEC).zip $(CFILES) $(HFILES) $(FILES)
 
 .PHONY: clean
 clean:
-	rm -f *.o $(EXEC)
+   rm -f *.o $(EXEC)
 ```
 
 ### **Comandos:**
@@ -171,5 +174,11 @@ Esta es una funcion interna del make la cual es llamada por `make $(EXEC)`. Solo
 ## **Funcionamiento:**
 
 ## **Teorico:**
+
+### **Explicar qué es un ABB y cómo se diferencia de un Árbol Binario.**
+
+### **Explicar cuál es el objetivo de tener una función de destrucción en el TDA y qué implicaría para el usuario no tenerla.**
+
+### **¿Cuál es la complejidad de las diferentes operaciones del ABB? Justifique.**
 
 ## **Creditos:**
