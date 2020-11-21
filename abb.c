@@ -3,7 +3,13 @@
 #define EXITO 0
 #define ERROR -1
 
-
+/*
+ * Recive una raiz y un destructor de raiz->elemento
+ * Si la raiz es nula no ocurre nada.
+ * Si no lo es, va recorriendo el arbol con un recorrido postorden
+ * cuando llega a una hoja, chequea si tiene que liberar el elemento
+ * y libera el nodo, recursivamente hata liberar todo el arbol.
+ */
 void destruir_nodos(nodo_abb_t* raiz,abb_liberar_elemento destructor){
     if(!raiz) return;
     destruir_nodos(raiz->izquierda,destructor);  //Postorden
@@ -31,8 +37,8 @@ abb_t* arbol_crear(abb_comparador comparador, abb_liberar_elemento destructor){
 }
 
 /*
-*
-*/
+ *
+ */
 nodo_abb_t* insertar_nodo_arbol(nodo_abb_t* raiz,void* elemento,abb_comparador comparador,bool* exito){
 	if(!raiz){
 		raiz = calloc(1,sizeof(nodo_abb_t));
@@ -71,17 +77,26 @@ int arbol_insertar(abb_t* arbol, void* elemento){
 	return ERROR;
 }
 
+/*
+ * Pre: Recive un nodo no nulo
+ * Post: Devuelve true si el nodo tiene almenos un hijo
+ */
 bool no_tiene_hijos(nodo_abb_t* raiz){
 	return ((!raiz->derecha)&&(!raiz->izquierda));
 }
 
+//Pre: Recive un nodo no nulo
+//Post: Devuelve true si el nodo tiene dos hijos
 bool tiene_dos_hijos(nodo_abb_t* raiz){
 	return ((raiz->derecha)&&(raiz->izquierda));
 }
 
 /*
-* 
-*/
+ * Busca el predecesor inorden recursivamente reciviendo 
+ * un nodo hijo izquierdo valido y un *elemento por referencia.
+ * Cuando se llega al predecesor inorden se gurada el elemento
+ * y se libera el nodo.
+ */
 nodo_abb_t* predecesor_inorden(nodo_abb_t* raiz,void** elemento){
 	if(!raiz->derecha){
 		*elemento = raiz->elemento;
@@ -98,7 +113,9 @@ nodo_abb_t* predecesor_inorden(nodo_abb_t* raiz,void** elemento){
 	return raiz;
 }
 
-
+/*
+ * 
+ */
 nodo_abb_t* borrar_nodo(nodo_abb_t* raiz,void* elemento,abb_t* arbol,bool* exito){
 	if(!raiz) return NULL; //No se encontro
 	
@@ -158,8 +175,9 @@ int arbol_borrar(abb_t* arbol, void* elemento){
 }
 
 /*
-*
-*/
+ *
+ * 
+ */
 void* buscar_nodo(nodo_abb_t* raiz,void* elemento,abb_comparador comparador){
 	if(!raiz){
 		return NULL;
@@ -175,6 +193,7 @@ void* buscar_nodo(nodo_abb_t* raiz,void* elemento,abb_comparador comparador){
 
 	return raiz->elemento;
 }
+
 /*
  * Busca en el arbol un elemento igual al provisto (utilizando la
  * funcion de comparación).
