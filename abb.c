@@ -79,6 +79,26 @@ bool tiene_dos_hijos(nodo_abb_t* raiz){
 	return ((raiz->derecha)&&(raiz->izquierda));
 }
 
+/*
+* 
+*/
+nodo_abb_t* predecesor_inorden(nodo_abb_t* raiz,void** elemento){
+	if(!raiz->derecha){
+		*elemento = raiz->elemento;
+
+		nodo_abb_t* nodo_aux=NULL;
+		if(raiz->izquierda){
+			nodo_aux = raiz->izquierda;
+		}
+		free(raiz);
+		return nodo_aux;
+	}
+
+	raiz->derecha = predecesor_inorden(raiz->derecha,elemento);
+	return raiz;
+}
+
+
 nodo_abb_t* borrar_nodo(nodo_abb_t* raiz,void* elemento,abb_t* arbol,bool* exito){
 	if(!raiz) return NULL; //No se encontro
 	
@@ -90,6 +110,12 @@ nodo_abb_t* borrar_nodo(nodo_abb_t* raiz,void* elemento,abb_t* arbol,bool* exito
 			(*exito)=true;
 			return NULL;
 		}else if (tiene_dos_hijos(raiz)){
+			void* elemento_aux = NULL;
+			raiz->izquierda = predecesor_inorden(raiz->izquierda,&elemento_aux);   //Busco el predecesor inorden gurado su elemento y libero el nodo
+
+			if(arbol->destructor) arbol->destructor(raiz->elemento);
+			raiz->elemento = elemento_aux;
+
 			(*exito)=true;
 			return raiz;
 		}
@@ -178,6 +204,16 @@ bool arbol_vacio(abb_t* arbol){
     return ((!arbol->nodo_raiz));
 }
 
+
+void llenar_array_inorden(nodo_abb_t* raiz,void* array[],size_t* contador, size_t tamanio){
+	if(!raiz||(!(tamanio-(*contador)))) return;
+	llenar_array_inorden(raiz->izquierda,array,contador, tamanio);
+	if(*contador != tamanio){
+		array[*contador] = raiz->elemento;
+		(*contador)++;
+	}
+	llenar_array_inorden(raiz->derecha,array,contador, tamanio);
+}
 /*
  * Llena el array del tamaño dado con los elementos de arbol
  * en secuencia inorden.
@@ -188,9 +224,22 @@ bool arbol_vacio(abb_t* arbol){
  */
 size_t arbol_recorrido_inorden(abb_t* arbol, void** array, size_t tamanio_array){
 	if(arbol_vacio(arbol)||!tamanio_array) return 0;
-	return 0;
+
+	size_t contador = 0;
+	llenar_array_inorden(arbol->nodo_raiz,array,&contador, tamanio_array);
+
+	return contador;
 }
 
+void llenar_array_preorden(nodo_abb_t* raiz,void* array[],size_t* contador, size_t tamanio){
+	if(!raiz||(!(tamanio-(*contador)))) return;
+	if(*contador != tamanio){
+		array[*contador] = raiz->elemento;
+		(*contador)++;
+	}
+	llenar_array_preorden(raiz->izquierda,array,contador, tamanio);
+	llenar_array_preorden(raiz->derecha,array,contador, tamanio);
+}
 /*
  * Llena el array del tamaño dado con los elementos de arbol
  * en secuencia preorden.
@@ -201,10 +250,22 @@ size_t arbol_recorrido_inorden(abb_t* arbol, void** array, size_t tamanio_array)
  */
 size_t arbol_recorrido_preorden(abb_t* arbol, void** array, size_t tamanio_array){
 	if(arbol_vacio(arbol)||!tamanio_array) return 0;
-	
-	return 0;
+	size_t contador = 0;
+	llenar_array_preorden(arbol->nodo_raiz,array,&contador, tamanio_array);
+
+	return contador;
 }
 
+
+void llenar_array_postorden(nodo_abb_t* raiz,void* array[],size_t* contador, size_t tamanio){
+	if(!raiz||(!(tamanio-(*contador)))) return;
+	llenar_array_postorden(raiz->izquierda,array,contador, tamanio);
+	llenar_array_postorden(raiz->derecha,array,contador, tamanio);
+	if(*contador != tamanio){
+		array[*contador] = raiz->elemento;
+		(*contador)++;
+	}
+}
 /*
  * Llena el array del tamaño dado con los elementos de arbol
  * en secuencia postorden.
@@ -215,7 +276,10 @@ size_t arbol_recorrido_preorden(abb_t* arbol, void** array, size_t tamanio_array
  */
 size_t arbol_recorrido_postorden(abb_t* arbol, void** array, size_t tamanio_array){
 	if(arbol_vacio(arbol)||!tamanio_array) return 0;
-	return 0;
+	size_t contador = 0;
+	llenar_array_postorden(arbol->nodo_raiz,array,&contador, tamanio_array);
+
+	return contador;
 }
 
 
@@ -247,7 +311,7 @@ bool recorrido_valido(int recorrido){
 }
 
 size_t abb_con_cada_elemento(abb_t* arbol, int recorrido, bool (*funcion)(void*, void*), void* extra){
-	if(!recorrido_valido(recorrido)) return 0;
+	if(!arbol||!recorrido_valido(recorrido)) return 0;
 
 	return 0;
 
