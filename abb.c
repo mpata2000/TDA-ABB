@@ -175,8 +175,9 @@ int arbol_borrar(abb_t* arbol, void* elemento){
 }
 
 /*
- *
- * 
+ * Busca de forma recursiva si en el arbol hay un elemento igual con la 
+ * funcion comparadora dada.
+ * Si lo encuenra devuelve el elemento en el nodo, sino devuelve NULL.
  */
 void* buscar_nodo(nodo_abb_t* raiz,void* elemento,abb_comparador comparador){
 	if(!raiz){
@@ -242,13 +243,14 @@ void llenar_array_inorden(nodo_abb_t* raiz,void* array[],size_t* contador, size_
  * pudo poner).
  */
 size_t arbol_recorrido_inorden(abb_t* arbol, void** array, size_t tamanio_array){
-	if(arbol_vacio(arbol)||!tamanio_array) return 0;
+	if(arbol_vacio(arbol)||!tamanio_array||!array) return 0;
 
 	size_t contador = 0;
 	llenar_array_inorden(arbol->nodo_raiz,array,&contador, tamanio_array);
 
 	return contador;
 }
+
 
 void llenar_array_preorden(nodo_abb_t* raiz,void* array[],size_t* contador, size_t tamanio){
 	if(!raiz||(!(tamanio-(*contador)))) return;
@@ -259,6 +261,7 @@ void llenar_array_preorden(nodo_abb_t* raiz,void* array[],size_t* contador, size
 	llenar_array_preorden(raiz->izquierda,array,contador, tamanio);
 	llenar_array_preorden(raiz->derecha,array,contador, tamanio);
 }
+
 /*
  * Llena el array del tamaño dado con los elementos de arbol
  * en secuencia preorden.
@@ -268,7 +271,7 @@ void llenar_array_preorden(nodo_abb_t* raiz,void* array[],size_t* contador, size
  * pudo poner).
  */
 size_t arbol_recorrido_preorden(abb_t* arbol, void** array, size_t tamanio_array){
-	if(arbol_vacio(arbol)||!tamanio_array) return 0;
+	if(arbol_vacio(arbol)||!tamanio_array||!array) return 0;
 	size_t contador = 0;
 	llenar_array_preorden(arbol->nodo_raiz,array,&contador, tamanio_array);
 
@@ -294,7 +297,7 @@ void llenar_array_postorden(nodo_abb_t* raiz,void* array[],size_t* contador, siz
  * pudo poner).
  */
 size_t arbol_recorrido_postorden(abb_t* arbol, void** array, size_t tamanio_array){
-	if(arbol_vacio(arbol)||!tamanio_array) return 0;
+	if(arbol_vacio(arbol)||!tamanio_array||!array) return 0;
 	size_t contador = 0;
 	llenar_array_postorden(arbol->nodo_raiz,array,&contador, tamanio_array);
 
@@ -313,6 +316,38 @@ void arbol_destruir(abb_t* arbol){
 	free(arbol);
 }
 
+
+void recorrido_inorden(nodo_abb_t* raiz,bool (*funcion)(void*,void*),void* extra,size_t* contador,bool* estado){
+	if(!raiz||*estado) return;
+	recorrido_inorden(raiz->izquierda,funcion,extra,contador,estado);
+	if(!(*estado)){
+		(*estado) = funcion(raiz->elemento,extra);
+		(*contador)++;
+	}
+	recorrido_inorden(raiz->derecha,funcion,extra,contador,estado);
+}
+
+
+void recorrido_preorden(nodo_abb_t* raiz,bool (*funcion)(void*,void*),void* extra,size_t* contador,bool* estado){
+	if(!raiz||*estado) return;
+	if(!(*estado)){
+		(*estado) = funcion(raiz->elemento,extra);
+		(*contador)++;
+	}
+	recorrido_preorden(raiz->izquierda,funcion,extra,contador,estado);
+	recorrido_preorden(raiz->derecha,funcion,extra,contador,estado);
+}
+
+
+void recorrido_postorden(nodo_abb_t* raiz,bool (*funcion)(void*,void*),void* extra,size_t* contador,bool* estado){
+	if(!raiz||*estado) return;
+	recorrido_postorden(raiz->izquierda,funcion,extra,contador,estado);
+	recorrido_postorden(raiz->derecha,funcion,extra,contador,estado);
+	if(!(*estado)){
+		(*estado) = funcion(raiz->elemento,extra);
+		(*contador)++;
+	}
+}
 /*
  * Iterador interno. Recorre el arbol e invoca la funcion con cada
  * elemento del mismo. El puntero 'extra' se pasa como segundo
@@ -324,14 +359,18 @@ void arbol_destruir(abb_t* arbol){
  * y ABB_RECORRER_POSTORDEN.
  * Devuelve la cantidad de elementos que fueron recorridos.
 */
-
-bool recorrido_valido(int recorrido){
-	return ((recorrido == ABB_RECORRER_INORDEN)||(recorrido == ABB_RECORRER_PREORDEN)||(recorrido == ABB_RECORRER_POSTORDEN));
-}
-
 size_t abb_con_cada_elemento(abb_t* arbol, int recorrido, bool (*funcion)(void*, void*), void* extra){
-	if(!arbol||!recorrido_valido(recorrido)) return 0;
+	if(arbol_vacio(arbol)||!funcion) return 0;
+	bool estado=false;
+	size_t contador=0;
 
-	return 0;
+	if(recorrido == ABB_RECORRER_INORDEN){
+		recorrido_inorden(arbol->nodo_raiz,funcion,extra,&contador,&estado);
+	}else if (recorrido == ABB_RECORRER_POSTORDEN){
+		recorrido_postorden(arbol->nodo_raiz,funcion,extra,&contador,&estado);
+	}else if (recorrido == ABB_RECORRER_PREORDEN){
+		recorrido_preorden(arbol->nodo_raiz,funcion,extra,&contador,&estado);
+	}
 
+	return contador;
 }

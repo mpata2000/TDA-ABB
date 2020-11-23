@@ -99,6 +99,7 @@ int main(){
 
     auxiliar->clave = 3;
     printf("Busco el elemento (3): %s\n", ((cosa*)arbol_buscar(arbol, auxiliar))->clave==3?"SI":"NO");
+    printf("Busco el elemento (3): %s\n", ((cosa*)arbol_raiz(arbol))->clave==3?"SI":"NO");
 
     cosa* elementos[10];
 
