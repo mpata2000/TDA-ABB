@@ -8,7 +8,7 @@ CFLAGS =  -g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O0
 GFLAGS = --tui
 VFLAGS = --leak-check=full --track-origins=yes --show-reachable=yes 
 
-$(EXEC): abb_minipruebas.c $(OBJETOS)
+$(EXEC): pruebas.c $(OBJETOS)
 	$(CC) $^ $(CFLAGS) -o $(EXEC)
 
 debug: $(EXEC)

@@ -87,9 +87,9 @@ $(EXEC): pruebas.c $(OBJETOS)
 
  Este comando compila el programa si y solo si el archivo de jecucion (EXEC) esta desactulizado.
 
-- `EXEC = lista_se`
+- `EXEC = abb`
   - El nombre del ejecutable que se quiere crear
-- `OBJETOS = lista.o lista_minipruebas.o -O0`
+- `OBJETOS = abb.o`
   - Los objetos que se quieren compilar para compilar el ejecutable(solo se vuelven a compilar lo objetos si estan des acutializados)
 - `CC = gcc`
   - El nombre del compilador que se va usar-
@@ -176,6 +176,8 @@ Esta es una funcion interna del make la cual es llamada por `make $(EXEC)`. Solo
 ## **Teorico:**
 
 ### **Explicar qué es un ABB y cómo se diferencia de un Árbol Binario.**
+
+
 
 ### **Explicar cuál es el objetivo de tener una función de destrucción en el TDA y qué implicaría para el usuario no tenerla.**
 

@@ -4,21 +4,13 @@
 #define ERROR -1
 
 /*
- * Recive una raiz y un destructor de raiz->elemento
- * Si la raiz es nula no ocurre nada.
- * Si no lo es, va recorriendo el arbol con un recorrido postorden
- * cuando llega a una hoja, chequea si tiene que liberar el elemento
- * y libera el nodo, recursivamente hata liberar todo el arbol.
- */
-void destruir_nodos(nodo_abb_t* raiz,abb_liberar_elemento destructor){
-    if(!raiz) return;
-    destruir_nodos(raiz->izquierda,destructor);  //Postorden
-    destruir_nodos(raiz->derecha,destructor);
-
-    if(destructor){
-		destructor(raiz->elemento);
-	}	
-    free(raiz);
+ * Recive un nodo y un destructor del elemento.
+ * Si hay que liberar el elemento lo libera y despues libera el nodo 
+*/
+void liberar_nodo(nodo_abb_t* nodo,abb_liberar_elemento destructor){
+	if(!nodo) return;
+	if(destructor) destructor(nodo->elemento);	
+    free(nodo);
 }
 /*
  * Crea el arbol y reserva la memoria necesaria de la estructura.
@@ -30,33 +22,38 @@ void destruir_nodos(nodo_abb_t* raiz,abb_liberar_elemento destructor){
  */
 abb_t* arbol_crear(abb_comparador comparador, abb_liberar_elemento destructor){
     if(!comparador) return NULL;
+
     abb_t* arbol = calloc(1,sizeof(abb_t));
     arbol->comparador = comparador;
     arbol->destructor = destructor;
     return arbol;
 }
 
+nodo_abb_t* crear_nodo(void* elemento,int* retorno){
+	nodo_abb_t* nodo = calloc(1,sizeof(nodo_abb_t));
+	if(!nodo){
+		*retorno = ERROR;
+		return NULL;
+	}
+	*retorno = EXITO;
+	nodo->elemento = elemento;
+	return nodo;
+}
+
 /*
  *
  */
-nodo_abb_t* insertar_nodo_arbol(nodo_abb_t* raiz,void* elemento,abb_comparador comparador,bool* exito){
+nodo_abb_t* insertar_nodo_arbol(nodo_abb_t* raiz,void* elemento,abb_comparador comparador,int* retorno){
 	if(!raiz){
-		raiz = calloc(1,sizeof(nodo_abb_t));
-		if(!raiz){
-			*exito = false;
-			return NULL;
-		}
-		*exito = true;
-		raiz->elemento = elemento;
+		raiz = crear_nodo(elemento,retorno);
 		return raiz;
 	}
 
 	if(comparador(elemento,raiz->elemento) > 0){
-		raiz->derecha = insertar_nodo_arbol(raiz->derecha,elemento,comparador,exito);
+		raiz->derecha = insertar_nodo_arbol(raiz->derecha,elemento,comparador,retorno);
 	}else{
-		raiz->izquierda = insertar_nodo_arbol(raiz->izquierda,elemento,comparador,exito);
+		raiz->izquierda = insertar_nodo_arbol(raiz->izquierda,elemento,comparador,retorno);
 	}
-
 	return raiz;
 }
 /*
@@ -66,15 +63,11 @@ nodo_abb_t* insertar_nodo_arbol(nodo_abb_t* raiz,void* elemento,abb_comparador c
  */
 int arbol_insertar(abb_t* arbol, void* elemento){
 	if(!arbol) return ERROR;
+	int retorno = ERROR;
+	arbol->nodo_raiz = insertar_nodo_arbol(arbol->nodo_raiz,elemento,arbol->comparador,&retorno);
 
-	bool exito = false;
+	return retorno;
 
-	arbol->nodo_raiz = insertar_nodo_arbol(arbol->nodo_raiz,elemento,arbol->comparador,&exito);
-
-	if(exito){
-		return EXITO;
-	}
-	return ERROR;
 }
 
 /*
@@ -99,12 +92,8 @@ bool tiene_dos_hijos(nodo_abb_t* raiz){
  */
 nodo_abb_t* predecesor_inorden(nodo_abb_t* raiz,void** elemento){
 	if(!raiz->derecha){
+		nodo_abb_t* nodo_aux=(raiz->izquierda)?raiz->izquierda:NULL;
 		*elemento = raiz->elemento;
-
-		nodo_abb_t* nodo_aux=NULL;
-		if(raiz->izquierda){
-			nodo_aux = raiz->izquierda;
-		}
 		free(raiz);
 		return nodo_aux;
 	}
@@ -116,43 +105,32 @@ nodo_abb_t* predecesor_inorden(nodo_abb_t* raiz,void** elemento){
 /*
  * 
  */
-nodo_abb_t* borrar_nodo(nodo_abb_t* raiz,void* elemento,abb_t* arbol,bool* exito){
+nodo_abb_t* borrar_nodo(nodo_abb_t* raiz,void* elemento,abb_t* arbol,int* retono){
 	if(!raiz) return NULL; //No se encontro
 	
 	int comparacion = arbol->comparador(elemento,raiz->elemento);
 
 	if(comparacion == 0){
+		(*retono) = EXITO;
 		if(no_tiene_hijos(raiz)){
-			destruir_nodos(raiz,arbol->destructor); //Lo libero y esta
-			(*exito)=true;
+			liberar_nodo(raiz,arbol->destructor); //Lo libero y esta
+
 			return NULL;
 		}else if (tiene_dos_hijos(raiz)){
-			void* elemento_aux = NULL;
-			raiz->izquierda = predecesor_inorden(raiz->izquierda,&elemento_aux);   //Busco el predecesor inorden gurado su elemento y libero el nodo
-
 			if(arbol->destructor) arbol->destructor(raiz->elemento);
-			raiz->elemento = elemento_aux;
-
-			(*exito)=true;
+			raiz->izquierda = predecesor_inorden(raiz->izquierda,&raiz->elemento);   //Busco el predecesor inorden gurado su elemento y libero el nodo
 			return raiz;
 		}
-		nodo_abb_t* nodo_hijo = NULL;
-		if(raiz->derecha){
-			nodo_hijo = raiz->derecha;
-			raiz->derecha = NULL;
-		}else{
-			nodo_hijo = raiz->izquierda;
-			raiz->izquierda = NULL;
-		}
-		destruir_nodos(raiz,arbol->destructor);
-		(*exito)=true;
+
+		nodo_abb_t* nodo_hijo = (raiz->derecha)?raiz->derecha:raiz->izquierda;
+		liberar_nodo(raiz,arbol->destructor);
 		return nodo_hijo;
 	}
 
 	if(comparacion > 0){
-		raiz->derecha = borrar_nodo(raiz->derecha,elemento,arbol,exito);
+		raiz->derecha = borrar_nodo(raiz->derecha,elemento,arbol,retono);
 	}else if(comparacion < 0){
-		raiz->izquierda = borrar_nodo(raiz->izquierda,elemento,arbol,exito);
+		raiz->izquierda = borrar_nodo(raiz->izquierda,elemento,arbol,retono);
 	}
 	return raiz;
 }
@@ -166,12 +144,10 @@ nodo_abb_t* borrar_nodo(nodo_abb_t* raiz,void* elemento,abb_t* arbol,bool* exito
  */
 int arbol_borrar(abb_t* arbol, void* elemento){
 	if(arbol_vacio(arbol)) return ERROR;
-	bool exito = false;
+	int retorno = ERROR;
 
-	arbol->nodo_raiz = borrar_nodo(arbol->nodo_raiz,elemento,arbol,&exito);
-	
-	if(exito) return EXITO;
-	return ERROR;
+	arbol->nodo_raiz = borrar_nodo(arbol->nodo_raiz,elemento,arbol,&retorno);	
+	return retorno;
 }
 
 /*
@@ -180,10 +156,8 @@ int arbol_borrar(abb_t* arbol, void* elemento){
  * Si lo encuenra devuelve el elemento en el nodo, sino devuelve NULL.
  */
 void* buscar_nodo(nodo_abb_t* raiz,void* elemento,abb_comparador comparador){
-	if(!raiz){
-		return NULL;
-	}
-
+	if(!raiz) return NULL;
+	
 	int comparacion = comparador(elemento,raiz->elemento);
 	
 	if(comparacion > 0){
@@ -225,14 +199,14 @@ bool arbol_vacio(abb_t* arbol){
 }
 
 
-void llenar_array_inorden(nodo_abb_t* raiz,void* array[],size_t* contador, size_t tamanio){
-	if(!raiz||(!(tamanio-(*contador)))) return;
-	llenar_array_inorden(raiz->izquierda,array,contador, tamanio);
+void llenar_array_recorrido(nodo_abb_t* raiz,void* array[],size_t* contador, size_t tamanio){
+	if(!raiz||((tamanio == (*contador)))) return;
+	llenar_array_recorrido(raiz->izquierda,array,contador, tamanio);
 	if(*contador != tamanio){
 		array[*contador] = raiz->elemento;
 		(*contador)++;
 	}
-	llenar_array_inorden(raiz->derecha,array,contador, tamanio);
+	llenar_array_recorrido(raiz->derecha,array,contador, tamanio);
 }
 /*
  * Llena el array del tamaño dado con los elementos de arbol
@@ -244,16 +218,15 @@ void llenar_array_inorden(nodo_abb_t* raiz,void* array[],size_t* contador, size_
  */
 size_t arbol_recorrido_inorden(abb_t* arbol, void** array, size_t tamanio_array){
 	if(arbol_vacio(arbol)||!tamanio_array||!array) return 0;
-
 	size_t contador = 0;
-	llenar_array_inorden(arbol->nodo_raiz,array,&contador, tamanio_array);
+	llenar_array_recorrido(arbol->nodo_raiz,array,&contador, tamanio_array);
 
 	return contador;
 }
 
 
 void llenar_array_preorden(nodo_abb_t* raiz,void* array[],size_t* contador, size_t tamanio){
-	if(!raiz||(!(tamanio-(*contador)))) return;
+	if(!raiz||((tamanio == (*contador)))) return;
 	if(*contador != tamanio){
 		array[*contador] = raiz->elemento;
 		(*contador)++;
@@ -280,7 +253,7 @@ size_t arbol_recorrido_preorden(abb_t* arbol, void** array, size_t tamanio_array
 
 
 void llenar_array_postorden(nodo_abb_t* raiz,void* array[],size_t* contador, size_t tamanio){
-	if(!raiz||(!(tamanio-(*contador)))) return;
+	if(!raiz||((tamanio == (*contador)))) return;
 	llenar_array_postorden(raiz->izquierda,array,contador, tamanio);
 	llenar_array_postorden(raiz->derecha,array,contador, tamanio);
 	if(*contador != tamanio){
@@ -304,6 +277,19 @@ size_t arbol_recorrido_postorden(abb_t* arbol, void** array, size_t tamanio_arra
 	return contador;
 }
 
+/*
+ * Recive una raiz y un destructor de raiz->elemento
+ * Si la raiz es nula no ocurre nada.
+ * Si no lo es, va recorriendo el arbol con un recorrido postorden
+ * cuando llega a una hoja, chequea si tiene que liberar el elemento
+ * y libera el nodo, recursivamente hata liberar todo el arbol.
+ */
+void destruir_nodos(nodo_abb_t* raiz,abb_liberar_elemento destructor){
+    if(!raiz) return;
+    destruir_nodos(raiz->izquierda,destructor);  //Postorden
+    destruir_nodos(raiz->derecha,destructor);
+    liberar_nodo(raiz,destructor);
+}
 
 /*
  * Destruye el arbol liberando la memoria reservada por el mismo.
@@ -311,7 +297,7 @@ size_t arbol_recorrido_postorden(abb_t* arbol, void** array, size_t tamanio_arra
  * el arbol.
  */
 void arbol_destruir(abb_t* arbol){
-    if(arbol_vacio(arbol)) return;
+    if(arbol == NULL) return;
 	destruir_nodos(arbol->nodo_raiz,arbol->destructor);
 	free(arbol);
 }
@@ -342,7 +328,7 @@ void recorrido_preorden(nodo_abb_t* raiz,bool (*funcion)(void*,void*),void* extr
 void recorrido_postorden(nodo_abb_t* raiz,bool (*funcion)(void*,void*),void* extra,size_t* contador,bool* estado){
 	if(!raiz||*estado) return;
 	recorrido_postorden(raiz->izquierda,funcion,extra,contador,estado);
-	recorrido_postorden(raiz->derecha,funcion,extra,contador,estado);
+	recorrido_postorden(raiz->derecha,funcion,extra,contador,estado);  
 	if(!(*estado)){
 		(*estado) = funcion(raiz->elemento,extra);
 		(*contador)++;
@@ -364,12 +350,21 @@ size_t abb_con_cada_elemento(abb_t* arbol, int recorrido, bool (*funcion)(void*,
 	bool estado=false;
 	size_t contador=0;
 
-	if(recorrido == ABB_RECORRER_INORDEN){
-		recorrido_inorden(arbol->nodo_raiz,funcion,extra,&contador,&estado);
-	}else if (recorrido == ABB_RECORRER_POSTORDEN){
-		recorrido_postorden(arbol->nodo_raiz,funcion,extra,&contador,&estado);
-	}else if (recorrido == ABB_RECORRER_PREORDEN){
-		recorrido_preorden(arbol->nodo_raiz,funcion,extra,&contador,&estado);
+	switch (recorrido){
+		case ABB_RECORRER_INORDEN:
+			recorrido_inorden(arbol->nodo_raiz,funcion,extra,&contador,&estado);
+			break;
+
+		case ABB_RECORRER_POSTORDEN:
+			recorrido_postorden(arbol->nodo_raiz,funcion,extra,&contador,&estado);
+			break;
+
+		case ABB_RECORRER_PREORDEN:
+			recorrido_preorden(arbol->nodo_raiz,funcion,extra,&contador,&estado);
+			break;
+
+		default:
+			break;
 	}
 
 	return contador;
