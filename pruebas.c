@@ -4,7 +4,6 @@
 
 #define EXITO 0
 #define ERROR -1
-#define MAX_PRUEBA_VOL 10000
 #define MAX_PRUEBAS_INSERTAR 6
 #define MAX_INSERTADO 10
 #define MAYOR 1
@@ -225,14 +224,7 @@ void pruebas_recorrido(){
     arbol_destruir(arbol);
 }
 
-bool funcion_iterador_orden(void* elemento, void* extra){
-    if(*((int*)extra) != ((id_persona_t*)elemento)->id) return true;
-    int* p_extra = (int*)extra;
-    p_extra++;
-    extra = p_extra;
 
-    return false;
-}
 /*
  * Funcion para el iterador interno que itera la mitad de los elementos
  * El extra tiene que ser un (int*) y se le suma 1 cada vez que se llama la funcion
@@ -244,6 +236,7 @@ bool funcion_iterador_cortar(void* elemento, void* extra){
 
     return false;
 }
+
 /*
  * Funcion para el iterador interno que itera todos los elementos
  * El extra tiene que ser un (int*) y se le suma 1 cada vez que se llama la funcion
@@ -259,11 +252,6 @@ void pruebas_iterador_interno(){
     id_persona_t* ids[MAX_INSERTADO];
     abb_t* arbol= crear_arbol_de_ids(ids);
     int contador=0;
-    int inorden[MAX_INSERTADO]={0,1,2,3,4,5,6,7,8,9};
-    int* p_inorden = inorden;
-    //int postorden[MAX_INSERTADO]={0,2,1,4,3,6,7,9,8,5};
-    //int preorden[MAX_INSERTADO]={5,3,1,0,2,4,8,7,6,9};
-    abb_con_cada_elemento(arbol,ABB_RECORRER_INORDEN,funcion_iterador_orden,p_inorden);
 
     pa2m_afirmar(!abb_con_cada_elemento(arbol,0,NULL,NULL),"NO se puede recorrer cada elemento sin funcion.");
     pa2m_afirmar(!abb_con_cada_elemento(arbol,-1,funcion_iterador,NULL),"NO se puede recorrer cada elemento sin recorrido valido.");
@@ -272,7 +260,6 @@ void pruebas_iterador_interno(){
     pa2m_nuevo_grupo("Iterador Recorrido Inorden");
     pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_INORDEN,funcion_iterador,&contador)==MAX_INSERTADO,"Se recorren la cantidad de elementos esperados.");
     pa2m_afirmar(contador==MAX_INSERTADO,"Se llama a la funcion la cantidad correcta")
-    pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_INORDEN,funcion_iterador_orden,p_inorden)==MAX_INSERTADO,"Se recorren los elementos en el orden correcto.");
     contador=0;
     pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_INORDEN,funcion_iterador_cortar,&contador)==MAX_INSERTADO/2,"Se recorren la cantidad de elementos esperados sin la funcion devuelve true.");
     pa2m_afirmar(contador==(MAX_INSERTADO/2),"Se llama a la funcion la cantidad correcta")
