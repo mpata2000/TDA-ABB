@@ -1,14 +1,15 @@
 CC = gcc
 CFILES = *.c
 HFILES = *.h
-OBJETOS = abb.o
-FILES = Enunciado README.md makefile
+MAIN = pruebas.c
+OBJETOS = abb.o abb_minipruebas.o
+FILES = Enunciado README.md makefile MAKEFILE.md
 EXEC = abb
 CFLAGS =  -g -std=c99 -Wall -Wconversion -Wtype-limits -pedantic -Werror -O0
 GFLAGS = --tui
 VFLAGS = --leak-check=full --track-origins=yes --show-reachable=yes 
 
-$(EXEC): pruebas.c $(OBJETOS)
+$(EXEC): $(MAIN) $(OBJETOS)
 	$(CC) $^ $(CFLAGS) -o $(EXEC)
 
 debug: $(EXEC)
