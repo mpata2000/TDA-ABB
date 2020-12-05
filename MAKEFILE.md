@@ -1,6 +1,6 @@
 # **Makefile:**
 
-Una explicacion mas a fondo de que hace cada comando del amkefile cuando son llamados. El makefile se puede modificar como a gusto.
+Una explicacion mas a fondo de que hace cada comando del amkefile cuando son llamados. El makefile se puede modificar a gusto.
 
 ## **Tabla de Contenidos**
 
