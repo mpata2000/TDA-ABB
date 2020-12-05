@@ -1,5 +1,9 @@
 # **TDA ABB**
 
+Este TDA ABB es el segundo TDA que se tiene que entregar para la aprobacion de la cursada de `Algoritmos y Programacion 2(75.41)-Catedra Mendez`.
+
+Se realizaron 105 pruebas propias para chequear el funcionamieno correcto del ABB.
+
 ## **Tabla de Contenidos**
 
 - [**TDA ABB**](#tda-abb)
@@ -14,6 +18,7 @@
     - [**Clean**](#clean)
   - [**Funcionamiento y Implementacion :**](#funcionamiento-y-implementacion-)
     - [**pruebas.c (el main):**](#pruebasc-el-main)
+    - [**pa2mm .h :**](#pa2mm-h-)
     - [**Puntero NULL**](#puntero-null)
     - [**Crear :**](#crear-)
     - [**Comparador:**](#comparador)
@@ -26,6 +31,9 @@
     - [**Iterador Interno**](#iterador-interno)
     - [**Recursividad :**](#recursividad-)
   - [**Teorico:**](#teorico)
+    - [**Explicar qué es un ABB y cómo se diferencia de un Árbol Binario.**](#explicar-qué-es-un-abb-y-cómo-se-diferencia-de-un-árbol-binario)
+    - [**Explicar cuál es el objetivo de tener una función de destrucción en el TDA y qué implicaría para el usuario no tenerla.**](#explicar-cuál-es-el-objetivo-de-tener-una-función-de-destrucción-en-el-tda-y-qué-implicaría-para-el-usuario-no-tenerla)
+    - [**¿Cuál es la complejidad de las diferentes operaciones del ABB? Justifique.**](#cuál-es-la-complejidad-de-las-diferentes-operaciones-del-abb-justifique)
   - [**Creditos:**](#creditos)
 
 ## **Compilacion y Ejecucion :**
@@ -67,7 +75,7 @@ Chequea si el ejecutable esta actualizado, si no lo esta se compila devuelta. De
 
 >`make zip`
 
-Si no existe el zip lo crea, sino actualiza el zip. Se zipean todos los .c y .h y las carpetas/archivos que se hayan puesto en la variable FILES en el makefile. El zip se va a llamar abb.zip (el nombre del ejecutable + .zip)
+Crea un zip. Se comprimen todos los .c y .h y las carpetas/archivos que se hayan puesto en la variable FILES en el makefile. El zip se va a llamar abb.zip (el nombre del ejecutable + .zip)
 
 ### **Clean**
 
@@ -80,6 +88,10 @@ Borra el ejecutable y los obejtos creados en la compilacion.
 ### **pruebas.c (el main):**
 
 Si el main recive mas de un argumento ela pruebas que se van a correr son las prueba de `abb_minipruebas.c` dada por la catedra. Si no se recive nada las pruebas que se van a correr son las del pruebas.c.
+
+### **pa2mm .h :**
+
+Para las pruebas hechas se utilizo la libreria proporcionada por la catedra creada por Lucas Pandolfo. Si tiene alguna queja sobre su implementacion vaya hablar con el, aca se utiliza como una libreria externa.
 
 ### **Puntero NULL**
 
@@ -149,19 +161,36 @@ Para todas las funciones que se requiere mas de iteracion se utilizo funciones r
 
 ## **Teorico:**
 
-**Explicar qué es un ABB y cómo se diferencia de un Árbol Binario.**
+### **Explicar qué es un ABB y cómo se diferencia de un Árbol Binario.**
 
-**Explicar cuál es el objetivo de tener una función de destrucción en el TDA y qué implicaría para el usuario no tenerla.**
+Un arbol binario de busqueda es un arbol de comparacion y un arbol binario donde cada nodo debe contener un valor clave de comparacion que satisfaga las siguientes condiciones:
+
+- La clave del hijo izquierdo(si exite) es menor que la clave del padre.
+- La clave del hijo derecha(si exite) es mayor que la clave del padre.
+- Cada sub-arbol es un ABB.
+
+A diferecia del un arbol binario que es una estructura de datos donde cada nodo tiene dos hijos pero los elementos de estos nodos no se encuentran ordenados.
+
+### **Explicar cuál es el objetivo de tener una función de destrucción en el TDA y qué implicaría para el usuario no tenerla.**
 
 El objetivo de tener una funcion de destruccion de elementose es permitirle al usuario meter elementos almacenados en el heap. Si no se brinda la opcion de utilizar un el destructor el usuario no podria hacer esto ya que al borrar un elemento o destruir el arbol el TDA de el no sabe que tipo de elemento se inserto y no lo podria usar. Ademas brindar la opcion permite que los elementos del ABB sean mas facil de modificar.
 
-**¿Cuál es la complejidad de las diferentes operaciones del ABB? Justifique.**
+### **¿Cuál es la complejidad de las diferentes operaciones del ABB? Justifique.**
 
-- Crear
-- Destruir
-- Vacio
-- Insertar
-- Eliminar
-- Recorrer
+- `Crear:` `O(1)` Ya que no depende del tamaño del arbol y su complejidad es constante.
+- `Destruir: O(n)` Ya que solo recorre una vez todos los nodos del arbol.
+- `Vacio: O(1)` Ya que no depende del tamaño del arbol y su complejidad es constante.
+- `Buscar:`
+  - Si el arbol esta balanceado `O(log(n))` ya que cada vez se reduce el problema a la mitad.
+  - Si el arbol no esta balanceado empieza a tender a ser una lista, entonces en el peor de los casos se recorre todos los nodos, entonces su complejidad es `O(n)`.
+- `Insertar:`  
+  - Si el arbol esta balanceado `O(log(n))` ya que cada vez se reduce el problema a la mitad.
+  - Si el arbol no esta balanceado empieza a tender a ser una lista, entonces en el peor de los casos se recorre todos los nodos, entonces su complejidad es `O(n)`.
+- `Eliminar:`
+  - Si el arbol esta balanceado `O(log(n))` ya que cada vez se reduce el problema a la mitad.
+  - Si el arbol no esta balanceado empieza a tender a ser una lista, entonces en el peor de los casos se recorre todos los nodos, entonces su complejidad es `O(n)`.
+- `Recorrer:` Todos los recorridos son `O(n)` ya que en el pero de los casos se recorre todos los nodos del arbol.
 
 ## **Creditos:**
+
+Este trabajo no se podria haber completado sin la ayuda de mi correcto Grabiel Pucci.
