@@ -60,7 +60,7 @@ bool mostrar_acumulado(void* elemento, void* extra){
 }
 
 
-int main(){
+void pruebas_catedra(){
     abb_t* arbol = arbol_crear(comparar_cosas, destructor_de_cosas);
 
     cosa* c1= crear_cosa(1);
@@ -158,5 +158,5 @@ int main(){
     
     free(auxiliar);
     arbol_destruir(arbol);
-    return 0;
+
 }
