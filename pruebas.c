@@ -1,5 +1,6 @@
 #include "pa2mm.h"
 #include "abb.h"
+#include "abb_minipruebas.h"
 
 #define EXITO 0
 #define ERROR -1
@@ -120,12 +121,19 @@ void pruebas_insertar(){
     pa2m_afirmar((id_persona_t*)arbol_raiz(arbol)==id[4],"La raiz es la correcta");
     pa2m_afirmar(!arbol_vacio(arbol),"Arbol no esta vacio");
     pa2m_afirmar(arbol_insertar(arbol,id[2])==EXITO,"Se puede insertar un elemento");          
-    pa2m_afirmar(arbol_insertar(arbol,id[3])==EXITO,"Se puede insertar un elemento");          
-    pa2m_afirmar(arbol_insertar(arbol,id[0])==EXITO,"Se puede insertar un elemento");          
-    pa2m_afirmar(arbol_insertar(arbol,id[1])==EXITO,"Se puede insertar un elemento");          
+    pa2m_afirmar(arbol->nodo_raiz->izquierda->elemento==id[2],"Se inserto a la izquierda de la raiz");          
+    pa2m_afirmar(arbol_insertar(arbol,id[3])==EXITO,"Se puede insertar un elemento");
+    pa2m_afirmar(arbol->nodo_raiz->izquierda->derecha->elemento==id[3],"Se inserto a la derecha del anterior");          
+    pa2m_afirmar(arbol_insertar(arbol,id[0])==EXITO,"Se puede insertar un elemento");
+    pa2m_afirmar(arbol->nodo_raiz->izquierda->izquierda->elemento==id[0],"Se inserto como primer inorden");          
+    pa2m_afirmar(arbol_insertar(arbol,id[1])==EXITO,"Se puede insertar un elemento");  
+    pa2m_afirmar(arbol->nodo_raiz->izquierda->izquierda->derecha->elemento==id[1],"Se inserto a la derecha del anterior");          
     pa2m_afirmar(arbol_insertar(arbol,id[5])==EXITO,"Se puede insertar un elemento");          
-    id_persona_t* id_aux = crear_id(6,0);
-    pa2m_afirmar(arbol_insertar(arbol,id_aux)==EXITO,"Se puede insertar un elemento con la misma \"clave\""); 
+    pa2m_afirmar(arbol->nodo_raiz->derecha->elemento==id[5],"Se inserto a la derecha de la raiz");          
+    id_persona_t* id_aux = crear_id(5,0);
+    pa2m_afirmar(arbol_insertar(arbol,id_aux)==EXITO,"Se puede insertar un elemento con la misma \"clave\"");
+    pa2m_afirmar(arbol->nodo_raiz->derecha->izquierda->elemento==id_aux,"Se inserto a la izquierda del anterior");                
+
     pa2m_afirmar(arbol_insertar(arbol,NULL)==EXITO,"Se puede insertar un elemento NULL");
 
     arbol_destruir(arbol);   //Pruebo que borrar libere todo
@@ -217,11 +225,20 @@ void pruebas_recorrido(){
     arbol_destruir(arbol);
 }
 
+bool funcion_iterador_orden(void* elemento, void* extra){
+    if(*((int*)extra) != ((id_persona_t*)elemento)->id) return true;
+    int* p_extra = (int*)extra;
+    p_extra++;
+    extra = p_extra;
+
+    return false;
+}
 /*
  * Funcion para el iterador interno que itera la mitad de los elementos
  * El extra tiene que ser un (int*) y se le suma 1 cada vez que se llama la funcion
 */
 bool funcion_iterador_cortar(void* elemento, void* extra){
+
     (*(int*)extra)++;
     if(*((int*)extra) == (MAX_INSERTADO/2)) return true;
 
@@ -242,6 +259,11 @@ void pruebas_iterador_interno(){
     id_persona_t* ids[MAX_INSERTADO];
     abb_t* arbol= crear_arbol_de_ids(ids);
     int contador=0;
+    int inorden[MAX_INSERTADO]={0,1,2,3,4,5,6,7,8,9};
+    int* p_inorden = inorden;
+    //int postorden[MAX_INSERTADO]={0,2,1,4,3,6,7,9,8,5};
+    //int preorden[MAX_INSERTADO]={5,3,1,0,2,4,8,7,6,9};
+    abb_con_cada_elemento(arbol,ABB_RECORRER_INORDEN,funcion_iterador_orden,p_inorden);
 
     pa2m_afirmar(!abb_con_cada_elemento(arbol,0,NULL,NULL),"NO se puede recorrer cada elemento sin funcion.");
     pa2m_afirmar(!abb_con_cada_elemento(arbol,-1,funcion_iterador,NULL),"NO se puede recorrer cada elemento sin recorrido valido.");
@@ -250,6 +272,7 @@ void pruebas_iterador_interno(){
     pa2m_nuevo_grupo("Iterador Recorrido Inorden");
     pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_INORDEN,funcion_iterador,&contador)==MAX_INSERTADO,"Se recorren la cantidad de elementos esperados.");
     pa2m_afirmar(contador==MAX_INSERTADO,"Se llama a la funcion la cantidad correcta")
+    pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_INORDEN,funcion_iterador_orden,p_inorden)==MAX_INSERTADO,"Se recorren los elementos en el orden correcto.");
     contador=0;
     pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_INORDEN,funcion_iterador_cortar,&contador)==MAX_INSERTADO/2,"Se recorren la cantidad de elementos esperados sin la funcion devuelve true.");
     pa2m_afirmar(contador==(MAX_INSERTADO/2),"Se llama a la funcion la cantidad correcta")
@@ -346,24 +369,26 @@ void pruebas_borrar(){
 }
 
 
-int main(){
-    pa2m_nuevo_grupo("Pruebas con NULL");
-    pruebas_null();
-    pa2m_nuevo_grupo("Pruebas crear arbol");
-    pruebas_crear();
-    pa2m_nuevo_grupo("Pruebas de insertar");
-    pruebas_insertar();
-    pa2m_nuevo_grupo("Pruebas de busqueda");
-    pruebas_buscar();
-    pa2m_nuevo_grupo("Pruebas recorridos");
-    pruebas_recorrido();
-    pa2m_nuevo_grupo("Pruebas Iterador interno");
-    pruebas_iterador_interno();
-    pa2m_nuevo_grupo("Pruebas Borrar");
-    pruebas_borrar();
-
-
-    pa2m_mostrar_reporte();
+int main(int argc, char *argv[] ){
+    if(argc > 1){
+        pruebas_catedra();
+    }else{
+        pa2m_nuevo_grupo("Pruebas con NULL");
+        pruebas_null();
+        pa2m_nuevo_grupo("Pruebas crear arbol");
+        pruebas_crear();
+        pa2m_nuevo_grupo("Pruebas de insertar");
+        pruebas_insertar();
+        pa2m_nuevo_grupo("Pruebas de busqueda");
+        pruebas_buscar();
+        pa2m_nuevo_grupo("Pruebas recorridos");
+        pruebas_recorrido();
+        pa2m_nuevo_grupo("Pruebas Iterador interno");
+        pruebas_iterador_interno();
+        pa2m_nuevo_grupo("Pruebas Borrar");
+        pruebas_borrar();
+        pa2m_mostrar_reporte();
+    }
 
     return 0;
 }
