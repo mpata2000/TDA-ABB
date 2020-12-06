@@ -122,7 +122,7 @@ Una ABB esta vacio cuando su raiz es nula.
 
 ### **Insertar :**
 
-Se puede insertar cualquier tipo de elemento solo se tiene que asegurarse de que las funciones usadas al crear el arbol sea capaz de usarlo.
+Se puede insertar cualquier tipo de elemento solo se tiene que asegurarse de que las funciones mandadasGio al crear el arbol sea capaz de usarlo.
 
 - Siempre chequee si la insercion falla.
 - Se puede insertar elementos con la misma clave de comparacion.
@@ -136,8 +136,9 @@ Se puede insertar cualquier tipo de elemento solo se tiene que asegurarse de que
 
 ### **Borrar :**
 
-El borrado del elemento solo puede fallar si no se encontro ese elemento.
+Cosas a tener en cuenta:
 
+- El borrado del elemento solo puede fallar si no se encontro ese elemento.
 - Si tiene dos elementos con la misma clave de comparacion se va a borrar el primero encontrado.
 - Cuando se borra un elemento con dos hijos se busca como remplazo su predecesor inorden.
 
