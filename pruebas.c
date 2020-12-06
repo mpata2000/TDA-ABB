@@ -25,9 +25,9 @@ typedef struct vector_orden{
 /*------------------------------------*/
 
 /*
- * Comparador de elementos. Recibe dos elementos del arbol y devuelve
- * 0 en caso de ser iguales, 1 si el primer elemento es mayor al
- * segundo o -1 si el primer elemento es menor al segundo.
+ * Comparador de ids. Recibe dos ids del arbol y devuelve
+ * 0 en caso de ser iguales la id, 1 si el primer id es mayor al
+ * segundo o -1 si el primer id es menor al segundo.
  */
 int comparador_de_numeros(void* elemento_1,void* elemento_2){
     if(!elemento_1) return MENOR;
@@ -40,12 +40,18 @@ int comparador_de_numeros(void* elemento_1,void* elemento_2){
     return IGUALES;
 }
 
+/*
+ * Libera un id_persona_t
+*/
 void destruir_id(void* persona){
     if(!(id_persona_t*)persona) return;  
 
     free((id_persona_t*)persona);
 }
 
+/*
+ * Crea un id_persona_t en el heap con la id y edad pasada
+*/
 id_persona_t* crear_id(int id,int edad){
     id_persona_t* persona = malloc(sizeof(id_persona_t));
     if(!persona) return NULL;
