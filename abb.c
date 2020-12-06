@@ -3,6 +3,11 @@
 #define EXITO 0
 #define ERROR -1
 
+typedef struct vector{
+	void** array;
+	size_t contador;
+	size_t tamanio;
+}vector_t;
 
 /*------------------------------------*/
 /*        Crear y Liberar Nodo        */
@@ -224,62 +229,119 @@ bool arbol_vacio(abb_t* arbol){
     return ((!arbol->nodo_raiz));
 }
 
-/*--------------------------------------------------------*/
-/*        Recorridos recursivos para llenar vector        */
-/*--------------------------------------------------------*/
+/*------------------------------------*/
+/*        Recorridos Recursivos       */
+/*------------------------------------*/
 
-void llenar_array_inorden(nodo_abb_t* raiz,void* array[],size_t* contador, size_t tamanio){
-	if(!raiz||((tamanio <= (*contador)))) return;
-	llenar_array_inorden(raiz->izquierda,array,contador, tamanio);
-	if(*contador < tamanio){
-		array[*contador] = raiz->elemento;
+/*
+ * Recive un nodo raiz, una funcion valida,un extra mandado por el usuario,
+ * un contador y un estado inicializado en false.
+ * Recorre el arbol en inorden de forma recursiva y se corta cuando se 
+ * hayan recorrido todos los nodos o la funcion deuvelva true.
+ * Por cada vez que se entre a la funcion el contador aumenta en 1
+ * y el estado es igualado al retorno de la funcion.
+*/
+void recorrido_inorden(nodo_abb_t* raiz,bool (*funcion)(void*,void*),void* extra,size_t* contador,bool* estado){
+	if(!raiz||*estado) return;
+	recorrido_inorden(raiz->izquierda,funcion,extra,contador,estado);
+	if(!(*estado)){
+		(*estado) = funcion(raiz->elemento,extra);
 		(*contador)++;
 	}
-	llenar_array_inorden(raiz->derecha,array,contador, tamanio);
+	recorrido_inorden(raiz->derecha,funcion,extra,contador,estado);
 }
 
-void llenar_array_preorden(nodo_abb_t* raiz,void* array[],size_t* contador, size_t tamanio){
-	if(!raiz||((tamanio <= (*contador)))) return;
-	if(*contador < tamanio){
-		array[*contador] = raiz->elemento;
+/*
+ * Recive un nodo raiz, una funcion valida,un extra mandado por el usuario,
+ * un contador y un estado inicializado en false.
+ * Recorre el arbol en preorden de forma recursiva y se corta cuando se 
+ * hayan recorrido todos los nodos o la funcion deuvelva true.
+ * Por cada vez que se entre a la funcion el contador aumenta en 1
+ * y el estado es igualado al retorno de la funcion.
+*/
+void recorrido_preorden(nodo_abb_t* raiz,bool (*funcion)(void*,void*),void* extra,size_t* contador,bool* estado){
+	if(!raiz||*estado) return;
+	if(!(*estado)){
+		(*estado) = funcion(raiz->elemento,extra);
 		(*contador)++;
 	}
-	llenar_array_preorden(raiz->izquierda,array,contador, tamanio);
-	llenar_array_preorden(raiz->derecha,array,contador, tamanio);
+	recorrido_preorden(raiz->izquierda,funcion,extra,contador,estado);
+	recorrido_preorden(raiz->derecha,funcion,extra,contador,estado);
 }
 
-void llenar_array_postorden(nodo_abb_t* raiz,void* array[],size_t* contador, size_t tamanio){
-	if(!raiz||((tamanio <= (*contador)))) return;
-	llenar_array_postorden(raiz->izquierda,array,contador, tamanio);
-	llenar_array_postorden(raiz->derecha,array,contador, tamanio);
-	if(*contador < tamanio){
-		array[*contador] = raiz->elemento;
+/*
+ * Recive un nodo raiz, una funcion valida,un extra mandado por el usuario,
+ * un contador y un estado inicializado en false.
+ * Recorre el arbol en postorden de forma recursiva y se corta cuando se 
+ * hayan recorrido todos los nodos o la funcion deuvelva true.
+ * Por cada vez que se entre a la funcion el contador aumenta en 1
+ * y el estado es igualado al retorno de la funcion.
+*/
+void recorrido_postorden(nodo_abb_t* raiz,bool (*funcion)(void*,void*),void* extra,size_t* contador,bool* estado){
+	if(!raiz||*estado) return;
+	recorrido_postorden(raiz->izquierda,funcion,extra,contador,estado);
+	recorrido_postorden(raiz->derecha,funcion,extra,contador,estado);  
+	if(!(*estado)){
+		(*estado) = funcion(raiz->elemento,extra);
 		(*contador)++;
 	}
+}
+
+/*-------------------------------*/
+/*        Recorridos Arbol       */
+/*-------------------------------*/
+
+/*
+ * La funcion recive el elemento que se quiere agregar y un vecto_t
+ * Si el contador es mayor igual al tamanio devuelve true
+ * Sino agrega el elemento en el tope del vector y se amuenta en uno el tope
+ * tope == contador 
+*/
+bool funcion_llenar_array_iterador(void* elemento,void* extra){
+	if(((vector_t*)extra)->contador >= ((vector_t*)extra)->tamanio) return true;
+	((vector_t*)extra)->array[((vector_t*)extra)->contador] = elemento;
+	(((vector_t*)extra)->contador)++;
+	return false;
+}
+
+/*
+ * Recive un vector_t y lo inicializa con los valores dados 
+ * y contador en 0
+*/
+void inicializar_vector_t(vector_t* vector,size_t tamanio,void** array){
+	vector->array=array;
+	vector->tamanio = tamanio;
+	vector->contador=0;
 }
 
 size_t arbol_recorrido_inorden(abb_t* arbol, void** array, size_t tamanio_array){
 	if(arbol_vacio(arbol)||!tamanio_array||!array) return 0;
-	size_t contador = 0;
-	llenar_array_inorden(arbol->nodo_raiz,array,&contador, tamanio_array);
-
-	return contador;
+	size_t aux = 0;  //Auxiliar para que funcione recorrido
+	bool estado=false;
+	vector_t vector;
+	inicializar_vector_t(&vector,tamanio_array,array);
+	recorrido_inorden(arbol->nodo_raiz,funcion_llenar_array_iterador,&vector,&aux,&estado);
+	return vector.contador;
 }
 
 size_t arbol_recorrido_preorden(abb_t* arbol, void** array, size_t tamanio_array){
 	if(arbol_vacio(arbol)||!tamanio_array||!array) return 0;
-	size_t contador = 0;
-	llenar_array_preorden(arbol->nodo_raiz,array,&contador, tamanio_array);
-
-	return contador;
+	size_t aux = 0;  //Auxiliar para que funcione recorrido
+	bool estado=false;
+	vector_t vector;
+	inicializar_vector_t(&vector,tamanio_array,array);
+	recorrido_preorden(arbol->nodo_raiz,funcion_llenar_array_iterador,&vector,&aux,&estado);
+	return vector.contador;
 }
 
 size_t arbol_recorrido_postorden(abb_t* arbol, void** array, size_t tamanio_array){
 	if(arbol_vacio(arbol)||!tamanio_array||!array) return 0;
-	size_t contador = 0;
-	llenar_array_postorden(arbol->nodo_raiz,array,&contador, tamanio_array);
-
-	return contador;
+	size_t aux = 0;  //Auxiliar para que funcione recorrido
+	bool estado=false;
+	vector_t vector;
+	inicializar_vector_t(&vector,tamanio_array,array);
+	recorrido_postorden(arbol->nodo_raiz,funcion_llenar_array_iterador,&vector,&aux,&estado);
+	return vector.contador;
 }
 
 /*-------------------------------*/
@@ -311,40 +373,9 @@ void arbol_destruir(abb_t* arbol){
 	free(arbol);
 }
 
-/*--------------------------------------------*/
-/*        Recorridos iterador interno         */
-/*--------------------------------------------*/
-
-void recorrido_inorden(nodo_abb_t* raiz,bool (*funcion)(void*,void*),void* extra,size_t* contador,bool* estado){
-	if(!raiz||*estado) return;
-	recorrido_inorden(raiz->izquierda,funcion,extra,contador,estado);
-	if(!(*estado)){
-		(*estado) = funcion(raiz->elemento,extra);
-		(*contador)++;
-	}
-	recorrido_inorden(raiz->derecha,funcion,extra,contador,estado);
-}
-
-void recorrido_preorden(nodo_abb_t* raiz,bool (*funcion)(void*,void*),void* extra,size_t* contador,bool* estado){
-	if(!raiz||*estado) return;
-	if(!(*estado)){
-		(*estado) = funcion(raiz->elemento,extra);
-		(*contador)++;
-	}
-	recorrido_preorden(raiz->izquierda,funcion,extra,contador,estado);
-	recorrido_preorden(raiz->derecha,funcion,extra,contador,estado);
-}
-
-void recorrido_postorden(nodo_abb_t* raiz,bool (*funcion)(void*,void*),void* extra,size_t* contador,bool* estado){
-	if(!raiz||*estado) return;
-	recorrido_postorden(raiz->izquierda,funcion,extra,contador,estado);
-	recorrido_postorden(raiz->derecha,funcion,extra,contador,estado);  
-	if(!(*estado)){
-		(*estado) = funcion(raiz->elemento,extra);
-		(*contador)++;
-	}
-}
-
+/*--------------------------------*/
+/*        Iterador Interno        */
+/*--------------------------------*/
 
 size_t abb_con_cada_elemento(abb_t* arbol, int recorrido, bool (*funcion)(void*, void*), void* extra){
 	if(arbol_vacio(arbol)||!funcion) return 0;
