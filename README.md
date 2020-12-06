@@ -193,4 +193,4 @@ El objetivo de tener una funcion de destruccion de elementose es permitirle al u
 
 ## **Creditos:**
 
-Este trabajo no se podria haber completado sin la ayuda de mi correcto Grabiel Pucci.
+Este trabajo no se podria haber completado sin la ayuda de mi corrector Grabiel Pucci.
