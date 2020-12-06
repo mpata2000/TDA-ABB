@@ -15,6 +15,15 @@ typedef struct id_persona{
     int edad;  
 }id_persona_t;
 
+typedef struct vector_orden{
+    int orden[MAX_INSERTADO];
+    int contador;
+}vector_orden_t;
+
+/*------------------------------------*/
+/*        Funciones Generales         */
+/*------------------------------------*/
+
 /*
  * Comparador de elementos. Recibe dos elementos del arbol y devuelve
  * 0 en caso de ser iguales, 1 si el primer elemento es mayor al
@@ -83,6 +92,10 @@ abb_t* crear_arbol_de_ids(id_persona_t** id){
     return arbol;
 }
 
+/*-----------------------------*/
+/*        Pruebas NULL         */
+/*-----------------------------*/
+
 void pruebas_null(){
     pa2m_afirmar(arbol_insertar(NULL,NULL) == ERROR,"Insertar en un arbol nulo da ERROR.");
     pa2m_afirmar(arbol_borrar(NULL,NULL) == ERROR,"Borrar en un arbol nulo da ERROR.");
@@ -95,18 +108,28 @@ void pruebas_null(){
     pa2m_afirmar(!abb_con_cada_elemento(NULL,0,NULL,NULL),"NO se puede recorrer cada elemento de un arbol nulo(devuelve 0).");
 }
 
+/*-----------------------------*/
+/*        Pruebas crear        */
+/*-----------------------------*/
+
 void pruebas_crear(){
     pa2m_afirmar(arbol_crear(NULL,NULL) == NULL,"No se puede crear un arbol sin comparador.");
     abb_t* arbol = arbol_crear(comparador_de_numeros,NULL);
     pa2m_afirmar(arbol != NULL,"Se puede crear un arbol sin destructor.");
     pa2m_afirmar(arbol_vacio(arbol),"Arbol creado esta vacio");
+    pa2m_afirmar(!arbol->nodo_raiz,"La raiz es nula");
     arbol_destruir(arbol);
 
     arbol = arbol_crear(comparador_de_numeros,destruir_id);
     pa2m_afirmar(arbol!= NULL,"Se puede crear un arbol con destructor.");
     pa2m_afirmar(arbol_vacio(arbol),"Arbol creado esta vacio");
+    pa2m_afirmar(!arbol->nodo_raiz,"La raiz es nula");
     arbol_destruir(arbol);
 }
+
+/*--------------------------------*/
+/*        Pruebas Insertar        */
+/*--------------------------------*/
 
 void pruebas_insertar(){
     abb_t* arbol = arbol_crear(comparador_de_numeros,destruir_id);
@@ -138,6 +161,10 @@ void pruebas_insertar(){
     arbol_destruir(arbol);   //Pruebo que borrar libere todo
 }
 
+/*-------------------------------*/
+/*        Pruebas Buscar         */
+/*-------------------------------*/
+
 void pruebas_buscar(){
     id_persona_t* id[MAX_INSERTADO];
     id_persona_t* id_aux = crear_id(0,0);
@@ -153,6 +180,10 @@ void pruebas_buscar(){
     arbol_destruir(arbol);
 }
 
+/*-----------------------------------------------------*/
+/*        Funciones auxiliares  Pruebas Recorrido      */
+/*-----------------------------------------------------*/
+
 /*
  * Llega un vectorde id_persona_t* y carga con NULL
  * cada posicion hasta el tope
@@ -164,7 +195,7 @@ void limpiar_vetor_id(id_persona_t** ids,int tope){
 }
 
 /*
- *LSe comparan los dos vectores hasta la cantidad recivida
+ * Se comparan los dos vectores hasta la cantidad recivida
  * SI se encuentra una diferencia devuelve false, si no true
 */
 bool comparar_vectores(id_persona_t** id_aux,id_persona_t** id_orden,int cantidad){
@@ -177,7 +208,9 @@ bool comparar_vectores(id_persona_t** id_aux,id_persona_t** id_orden,int cantida
     return exito;
 }
 
-
+/*---------------------------------*/
+/*        Pruebas Recorrido        */
+/*---------------------------------*/
 
 void pruebas_recorrido(){
     id_persona_t* id_aux[MAX_INSERTADO];
@@ -185,6 +218,7 @@ void pruebas_recorrido(){
     abb_t* arbol= crear_arbol_de_ids(id_inorden);
     id_persona_t* id_postorden[MAX_INSERTADO]={id_inorden[0],id_inorden[2],id_inorden[1],id_inorden[4],id_inorden[3],id_inorden[6],id_inorden[7],id_inorden[9],id_inorden[8],id_inorden[5]};
     id_persona_t* id_preorden[MAX_INSERTADO]={id_inorden[5],id_inorden[3],id_inorden[1],id_inorden[0],id_inorden[2],id_inorden[4],id_inorden[8],id_inorden[7],id_inorden[6],id_inorden[9]};
+
 
     pa2m_nuevo_grupo("Recorrido Inorden");
     pa2m_afirmar(!arbol_recorrido_inorden(arbol,NULL,0),"Recorrido arbol inorden sin vector devuelve 0.");
@@ -224,7 +258,62 @@ void pruebas_recorrido(){
     arbol_destruir(arbol);
 }
 
+/*------------------------------------------------------------*/
+/*        Funciones auxiliares->Pruebas Iterador Interno      */
+/*------------------------------------------------------------*/
 
+/*
+ * Recive un vector valido, un contador por referecia (preferiblemente del stuct vector_orden_t) y el recorrido
+ * Llena el vector con los elementos del arbol en el orden correspondiente.
+ * El contador se iguala a 0.
+*/
+void llenar_vector_orden(int vec[MAX_INSERTADO],int* contador,int recorrido){
+    switch (recorrido){
+		case ABB_RECORRER_INORDEN:
+			for (int i = 0; i < MAX_INSERTADO; i++){
+                vec[i]=i;
+            }
+			break;
+
+		case ABB_RECORRER_POSTORDEN:
+            vec[0]=0;
+            vec[1]=2;
+            vec[2]=1;
+            vec[3]=4;
+            vec[4]=3;
+            vec[5]=6;
+            vec[6]=7;
+            vec[7]=9;
+            vec[8]=8;
+            vec[9]=5;
+			break;
+
+		case ABB_RECORRER_PREORDEN:
+			vec[0]=5;
+            vec[1]=3;
+            vec[2]=1;
+            vec[3]=0;
+            vec[4]=2;
+            vec[5]=4;
+            vec[6]=8;
+            vec[7]=7;
+            vec[8]=6;
+            vec[9]=9;
+			break;
+	}  
+    *contador=0;
+}
+
+/*
+ * Funcion para el iterador interno que itera mientras que el orden sea el correcto
+ * El extra tiene que ser un (vector_orden_t)
+*/
+bool funcion_iterador_orden(void* elemento, void* extra){
+    if(((vector_orden_t*)extra)->orden[((vector_orden_t*)extra)->contador] != ((id_persona_t*)elemento)->id) return true;
+    ((vector_orden_t*)extra)->contador++;
+
+    return false;
+}
 /*
  * Funcion para el iterador interno que itera la mitad de los elementos
  * El extra tiene que ser un (int*) y se le suma 1 cada vez que se llama la funcion
@@ -248,9 +337,15 @@ bool funcion_iterador(void* elemento, void* extra){
     return false;
 }
 
+/*----------------------------------------*/
+/*        Pruebas Iterador Interno        */
+/*----------------------------------------*/
+
 void pruebas_iterador_interno(){
     id_persona_t* ids[MAX_INSERTADO];
     abb_t* arbol= crear_arbol_de_ids(ids);
+    vector_orden_t extra;
+    llenar_vector_orden(extra.orden,&(extra.contador),ABB_RECORRER_INORDEN);
     int contador=0;
 
     pa2m_afirmar(!abb_con_cada_elemento(arbol,0,NULL,NULL),"NO se puede recorrer cada elemento sin funcion.");
@@ -260,22 +355,27 @@ void pruebas_iterador_interno(){
     pa2m_nuevo_grupo("Iterador Recorrido Inorden");
     pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_INORDEN,funcion_iterador,&contador)==MAX_INSERTADO,"Se recorren la cantidad de elementos esperados.");
     pa2m_afirmar(contador==MAX_INSERTADO,"Se llama a la funcion la cantidad correcta")
+    pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_INORDEN,funcion_iterador_orden,&extra)==MAX_INSERTADO,"Se recorren los elementos en el orden correcto.");
     contador=0;
     pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_INORDEN,funcion_iterador_cortar,&contador)==MAX_INSERTADO/2,"Se recorren la cantidad de elementos esperados sin la funcion devuelve true.");
     pa2m_afirmar(contador==(MAX_INSERTADO/2),"Se llama a la funcion la cantidad correcta")
     contador=0;
+    llenar_vector_orden(extra.orden,&(extra.contador),ABB_RECORRER_POSTORDEN);
 
     pa2m_nuevo_grupo("Iterador Recorrido Postorden");
     pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_POSTORDEN,funcion_iterador,&contador)==MAX_INSERTADO,"Se recorren la cantidad de elementos esperados.");
     pa2m_afirmar(contador==MAX_INSERTADO,"Se llama a la funcion la cantidad correcta")
+    pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_POSTORDEN,funcion_iterador_orden,&extra)==MAX_INSERTADO,"Se recorren los elementos en el orden correcto.");
     contador=0;
     pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_POSTORDEN,funcion_iterador_cortar,&contador)==(MAX_INSERTADO/2),"Se recorren la cantidad de elementos esperados sin la funcion devuelve true.");
     pa2m_afirmar(contador==(MAX_INSERTADO/2),"Se llama a la funcion la cantidad correcta")
     contador=0;
+    llenar_vector_orden(extra.orden,&(extra.contador),ABB_RECORRER_PREORDEN);
     
     pa2m_nuevo_grupo("Iterador Recorrido Preorden");
     pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_PREORDEN,funcion_iterador,&contador)==MAX_INSERTADO,"Se recorren la cantidad de elementos esperados.");
     pa2m_afirmar(contador==MAX_INSERTADO,"Se llama a la funcion la cantidad correcta")
+    pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_PREORDEN,funcion_iterador_orden,&extra)==MAX_INSERTADO,"Se recorren los elementos en el orden correcto.");
     contador=0;
     pa2m_afirmar(abb_con_cada_elemento(arbol,ABB_RECORRER_PREORDEN,funcion_iterador_cortar,&contador)==(MAX_INSERTADO/2),"Se recorren la cantidad de elementos esperados sin la funcion devuelve true.");
     pa2m_afirmar(contador==(MAX_INSERTADO/2),"Se llama a la funcion la cantidad correcta")
@@ -283,6 +383,10 @@ void pruebas_iterador_interno(){
 
     arbol_destruir(arbol);
 }
+
+/*------------------------------*/
+/*        Pruebas Borrar        */
+/*------------------------------*/
 
 void pruebas_borrar(){
     id_persona_t* ids[MAX_INSERTADO];
