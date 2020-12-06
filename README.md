@@ -2,7 +2,7 @@
 
 Este TDA ABB es el segundo TDA que se tiene que entregar para la aprobacion de la cursada de `Algoritmos y Programacion 2(75.41)-Catedra Mendez`.
 
-Se realizaron 105 pruebas propias para chequear el funcionamieno correcto del ABB.
+Se realizaron 110 pruebas propias para chequear el funcionamieno correcto del ABB.
 
 ## **Tabla de Contenidos**
 
@@ -28,7 +28,7 @@ Se realizaron 105 pruebas propias para chequear el funcionamieno correcto del AB
     - [**Buscar:**](#buscar)
     - [**Borrar :**](#borrar-)
     - [**Recorridos :**](#recorridos-)
-    - [**Iterador Interno**](#iterador-interno)
+    - [**Iterador Interno :**](#iterador-interno-)
     - [**Recursividad :**](#recursividad-)
   - [**Teorico:**](#teorico)
     - [**Explicar qué es un ABB y cómo se diferencia de un Árbol Binario.**](#explicar-qué-es-un-abb-y-cómo-se-diferencia-de-un-árbol-binario)
@@ -145,7 +145,7 @@ El borrado del elemento solo puede fallar si no se encontro ese elemento.
 
 Para hacer cualquiera de los recorridos se tiene que mandar un size_t valido de los elementos a recorrer y un array no nulo que pueda almacenar los elementos almacenados en el arbol.
 
-### **Iterador Interno**
+### **Iterador Interno :**
 
 El iterador interno para funcionar tiene que recivir uno de los recorridos validos definidos en el abb.h y una funcion no nula.
 
